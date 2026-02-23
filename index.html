@@ -200,7 +200,7 @@
             font-weight: 600;
         }
 
-        /* SOS Page - BIG BUTTON, NO SCROLL */
+        /* SOS Page - HUGE BUTTON */
         .sos-page {
             display: none;
             max-width: 400px;
@@ -356,27 +356,33 @@
             flex-shrink: 0;
         }
 
-        /* Simple history section - minimal */
-        .history-mini {
+        /* Announcement Section - replaced Kasaysayan */
+        .announcement-section {
             flex-shrink: 0;
             margin-top: 5px;
-            max-height: 70px;
-            overflow-y: auto;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 5px;
         }
 
-        .history-item {
+        .announcement-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #ff4d4d;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .announcement-content {
             background: #f8f9fa;
-            padding: 4px 8px;
-            border-radius: 6px;
-            border-left: 3px solid #ff4d4d;
-            font-size: 10px;
-            margin-bottom: 3px;
-        }
-
-        .history-item small {
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 12px;
             color: #666;
-            font-size: 8px;
-            margin-left: 4px;
+            text-align: center;
+            border-left: 3px solid #ff4d4d;
+            font-style: italic;
         }
 
         .hidden {
@@ -455,7 +461,7 @@
             </div>
         </div>
 
-        <!-- SOS Page - HUGE BUTTON -->
+        <!-- SOS Page - HUGE BUTTON with Announcement -->
         <div id="sosPage" class="sos-page">
             <div class="sos-header">
                 <span class="sos-logo">DIMAX Emergency</span>
@@ -477,8 +483,15 @@
                 <div id="sosStatus" class="status-message"></div>
                 <div id="locationNote" class="location-note">📍 Ibahagi ang location</div>
                 
-                <!-- Mini history - no title, just icons -->
-                <div id="historyMini" class="history-mini"></div>
+                <!-- Announcement Section - replaces Kasaysayan -->
+                <div class="announcement-section">
+                    <div class="announcement-title">
+                        <span>📢 Announcement</span>
+                    </div>
+                    <div class="announcement-content">
+                        ⚙️ Work in progress
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -513,7 +526,6 @@
                 if (userDoc.exists) {
                     currentUser = userDoc.data();
                     showSOSPage();
-                    loadMiniHistory();
                 }
             } else {
                 showLandingPage();
@@ -655,32 +667,6 @@
             }
         }
 
-        async function loadMiniHistory() {
-            if (!auth.currentUser) return;
-            
-            const snapshot = await db.collection(EMERGENCIES_COLLECTION)
-                .where('userId', '==', auth.currentUser.uid)
-                .orderBy('timestamp', 'desc')
-                .limit(2)
-                .get();
-            
-            const historyDiv = document.getElementById('historyMini');
-            historyDiv.innerHTML = '';
-            
-            if (snapshot.empty) return;
-            
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const date = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleTimeString() : '';
-                const icon = data.location ? '📍' : '🚨';
-                historyDiv.innerHTML += `
-                    <div class="history-item">
-                        ${icon} Emergency <small>${date}</small>
-                    </div>
-                `;
-            });
-        }
-
         // SOS Button
         const sosButton = document.getElementById('sosButton');
         const statusDiv = document.getElementById('sosStatus');
@@ -777,8 +763,6 @@
                         statusDiv.className = 'status-message error';
                     }
                 }
-                
-                loadMiniHistory();
             }
         });
     </script>
